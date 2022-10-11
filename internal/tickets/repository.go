@@ -1,14 +1,23 @@
 package tickets
 
 import (
-	"context"
+	domain "desafio-goweb-marioescudero/internal/domains"
 	"fmt"
-
 )
 
+/*type Ticket struct {
+	Id      string
+	Name    string
+	Email   string
+	Country string
+	Time    string
+	Price   float64
+} */
+
 type Repository interface {
-	GetAll(ctx context.Context) ([]domain.Ticket, error)
-	GetTicketByDestination(ctx context.Context, destination string) ([]domain.Ticket, error)
+	GetAll() ([]domain.Ticket, error)
+	GetTicketByDestination(destination string) ([]domain.Ticket, error)
+	GetAverageByDestination(destination string) (int, error)
 }
 
 type repository struct {
@@ -21,7 +30,7 @@ func NewRepository(db []domain.Ticket) Repository {
 	}
 }
 
-func (r *repository) GetAll(ctx context.Context) ([]domain.Ticket, error) {
+func (r *repository) GetAll() ([]domain.Ticket, error) {
 
 	if len(r.db) == 0 {
 		return []domain.Ticket{}, fmt.Errorf("empty list of tickets")
@@ -30,7 +39,7 @@ func (r *repository) GetAll(ctx context.Context) ([]domain.Ticket, error) {
 	return r.db, nil
 }
 
-func (r *repository) GetTicketByDestination(ctx context.Context, destination string) ([]domain.Ticket, error) {
+func (r *repository) GetTicketByDestination(destination string) ([]domain.Ticket, error) {
 
 	var ticketsDest []domain.Ticket
 
@@ -45,4 +54,26 @@ func (r *repository) GetTicketByDestination(ctx context.Context, destination str
 	}
 
 	return ticketsDest, nil
+}
+
+func (r *repository) GetAverageByDestination(destination string) (int, error) {
+
+	//var ticketsDest []domain.Ticket
+
+	if len(r.db) == 0 {
+		return 0, nil
+	}
+
+	cantidadDest := 0
+	for _, t := range r.db {
+
+		if t.Country == destination {
+			cantidadDest++
+		}
+
+	}
+	promedio := cantidadDest
+
+	return promedio, nil
+
 }

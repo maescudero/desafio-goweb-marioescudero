@@ -1,27 +1,36 @@
 package main
 
 import (
+	"desafio-goweb-marioescudero/cmd/server/handler"
+	domain "desafio-goweb-marioescudero/internal/domains"
+	"desafio-goweb-marioescudero/internal/tickets"
 	"encoding/csv"
 	"fmt"
 	"os"
 	"strconv"
 
-	"desafio-go-web/internal/domain"
+	//"desafio-go-web/internal/domain"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 
 	// Cargo csv.
-	list, err := LoadTicketsFromFile("../../tickets.csv")
+	list, err := LoadTicketsFromFile("./tickets.csv")
 	if err != nil {
 		panic("Couldn't load tickets")
 	}
+	repo := tickets.NewRepository(list)
+	service := tickets.NewService(repo)
+
+	p := handler.NewService(service)
 
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) { c.String(200, "pong") })
 	// Rutas a desarollar:
-	
+	r.GET("/getAll", p.GetAllTickets())
+	r.GET("/getByCountry/:dest", p.GetTicketsByCountry())
+	r.GET("/getAverage/:dest", p.AverageDestination())
 	// GET - “/ticket/getByCountry/:dest”
 	// GET - “/ticket/getAverage/:dest”
 	if err := r.Run(); err != nil {
